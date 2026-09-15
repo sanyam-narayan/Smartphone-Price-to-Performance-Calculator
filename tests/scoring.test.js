@@ -120,4 +120,32 @@ test('calculateValueScores', (t) => {
     const filtered = filterPhonesByPrice(phones, 7000, 20000);
     assert.deepStrictEqual(filtered.map(phone => phone.name), ['Mid']);
   });
+
+  t.test('should prefer a better-performing phone over an extremely cheap but weak one', () => {
+    const phones = [
+      {
+        name: 'Ultra Cheap Weak',
+        price: 4000,
+        antutu: 100000,
+        ram: 4,
+        storage: 64,
+        battery: 3000,
+        refreshRate: 60,
+        cameraMP: 8
+      },
+      {
+        name: 'Balanced Mid',
+        price: 18000,
+        antutu: 500000,
+        ram: 8,
+        storage: 128,
+        battery: 6000,
+        refreshRate: 120,
+        cameraMP: 50
+      }
+    ];
+
+    const ranked = calculateValueScores(phones, { performance: 30, memory: 15, battery: 20, display: 15, camera: 20 });
+    assert.strictEqual(ranked[0].name, 'Balanced Mid');
+  });
 });

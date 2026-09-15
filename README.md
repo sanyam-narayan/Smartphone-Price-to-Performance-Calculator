@@ -10,7 +10,7 @@ A small full-stack web application that ranks budget Android phones based on the
 - **Node.js**: Runtime environment.
 
 ## How the Value Score is Calculated
-Each raw specification (like AnTuTu benchmark, RAM, Battery) is scaled to a 0–100 score relative to all other phones in the database using min-max normalization. These normalized scores are then combined using user-adjustable weights to produce a Performance Score. Finally, this Performance Score is divided by the phone's price to determine raw value-for-money, which is min-max normalized again to generate the final 0–100 Value Score used for ranking.
+Each specification (like AnTuTu, RAM, battery, display, and camera) is first normalized to a 0–100 score relative to the phones currently in the database. These normalized scores are blended using user-adjustable weights to create a Performance Score. Then a price advantage is applied so cheaper phones get a meaningful bonus without letting very weak budget phones outrank better devices. The final result is normalized across the current list to produce a 0–100 Value Score for ranking.
 
 ## How to Run Locally
 
