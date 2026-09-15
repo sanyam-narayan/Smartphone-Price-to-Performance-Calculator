@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { normalize, calculateValueScores, DEFAULT_PRICE_BUCKETS, getPopularPhonesForRange } = require('../scoring');
+const { normalize, calculateValueScores, DEFAULT_PRICE_BUCKETS, getPopularPhonesForRange, filterPhonesByPrice } = require('../scoring');
 
 test('normalize', (t) => {
   t.test('should correctly normalize values', () => {
@@ -108,5 +108,16 @@ test('calculateValueScores', (t) => {
     assert.ok(Array.isArray(phones));
     assert.ok(phones.length >= 10);
     assert.ok(phones.every(phone => phone.price >= 10000 && phone.price <= 25000));
+  });
+
+  t.test('should filter phones by the selected price range before ranking', () => {
+    const phones = [
+      { name: 'Cheap', price: 5000, antutu: 100000, ram: 4, storage: 64, battery: 4000, refreshRate: 60, cameraMP: 12 },
+      { name: 'Mid', price: 15000, antutu: 200000, ram: 6, storage: 128, battery: 5000, refreshRate: 90, cameraMP: 24 },
+      { name: 'Expensive', price: 40000, antutu: 350000, ram: 8, storage: 256, battery: 6000, refreshRate: 120, cameraMP: 48 }
+    ];
+
+    const filtered = filterPhonesByPrice(phones, 7000, 20000);
+    assert.deepStrictEqual(filtered.map(phone => phone.name), ['Mid']);
   });
 });

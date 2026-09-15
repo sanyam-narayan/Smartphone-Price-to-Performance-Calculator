@@ -146,6 +146,16 @@ const DEFAULT_PRICE_BUCKETS = [
   }
 ];
 
+function filterPhonesByPrice(phones, minPrice, maxPrice) {
+  const low = Number(minPrice) || 0;
+  const high = Number(maxPrice) || Number.MAX_SAFE_INTEGER;
+
+  return (phones || []).filter(phone => {
+    const price = Number(phone.price);
+    return price >= low && price <= high;
+  });
+}
+
 function getPopularPhonesForRange(minPrice, maxPrice) {
   const low = Number(minPrice) || 0;
   const high = Number(maxPrice) || Number.MAX_SAFE_INTEGER;
@@ -262,5 +272,6 @@ module.exports = {
   normalize,
   calculateValueScores,
   DEFAULT_PRICE_BUCKETS,
-  getPopularPhonesForRange
+  getPopularPhonesForRange,
+  filterPhonesByPrice
 };

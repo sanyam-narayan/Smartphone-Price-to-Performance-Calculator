@@ -154,12 +154,17 @@
       display: document.getElementById('w-display').value,
       camera: document.getElementById('w-camera').value,
     };
+    const min = Number(document.getElementById('min-price').value || 0);
+    const max = Number(document.getElementById('max-price').value || 50000);
 
     ['performance', 'memory', 'battery', 'display', 'camera'].forEach(k => {
       document.getElementById('v-' + k).textContent = weights[k];
     });
 
     const params = new URLSearchParams(weights);
+    params.set('min', Math.max(0, min));
+    params.set('max', Math.max(500, max));
+
     try {
       const res = await fetch('/api/phones?' + params.toString());
       const newPhones = await res.json();

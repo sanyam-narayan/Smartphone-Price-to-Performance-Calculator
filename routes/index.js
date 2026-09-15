@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Phone = require('../models/Phone');
-const { calculateValueScores, DEFAULT_PRICE_BUCKETS, getPopularPhonesForRange } = require('../scoring');
+const { calculateValueScores, DEFAULT_PRICE_BUCKETS, getPopularPhonesForRange, filterPhonesByPrice } = require('../scoring');
 
 const DEFAULT_WEIGHTS = {
   performance: 30,
@@ -16,8 +16,9 @@ router.get('/', async (req, res) => {
   try {
     const minPrice = Number(req.query.min) || 0;
     const maxPrice = Number(req.query.max) || 50000;
-    const phones = await Phone.find({}).lean();
-    const rankedPhones = calculateValueScores(phones, DEFAULT_WEIGHTS);
+    const allPhones = await Phone.find({}).lean();
+    const filteredPhones = filterPhonesByPrice(allPhones, minPrice, maxPrice);
+    const rankedPhones = calculateValueScores(filteredPhones, DEFAULT_WEIGHTS);
     const popularPhones = getPopularPhonesForRange(minPrice, maxPrice);
 
     res.render('index', {
@@ -44,9 +45,12 @@ router.get('/api/phones', async (req, res) => {
       display: Number(req.query.display) || 0,
       camera: Number(req.query.camera) || 0
     };
+    const minPrice = Number(req.query.min) || 0;
+    const maxPrice = Number(req.query.max) || 50000;
 
     const phones = await Phone.find({}).lean();
-    const rankedPhones = calculateValueScores(phones, weights);
+    const filteredPhones = filterPhonesByPrice(phones, minPrice, maxPrice);
+    const rankedPhones = calculateValueScores(filteredPhones, weights);
     res.json(rankedPhones);
   } catch (err) {
     console.error(err);
