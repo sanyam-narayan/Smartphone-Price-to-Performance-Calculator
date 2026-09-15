@@ -1,10 +1,49 @@
 <%- include('header') %>
 
   <header>
-    <h1>Spec/₹</h1>
-    <p>Ranks budget Android phones by performance-per-rupee — weighted the way you actually care about, not a fixed formula.</p>
+    <h1>Smart Phone Price to Performance Calculator</h1>
+    <p>Compare phones across budgets and find the best value for your money with a customizable price-to-performance score.</p>
     <a href="/add" class="btn">+ Add New Phone</a>
   </header>
+
+  <section class="budget-grid">
+    <div class="budget-panel">
+      <h2>Pick a price range</h2>
+      <div class="price-pills">
+        <% defaultPriceBuckets.forEach(function(bucket) { %>
+          <button class="price-pill <%= (bucket.min === priceRange.min && bucket.max === priceRange.max) ? 'active' : '' %>" data-min="<%= bucket.min %>" data-max="<%= bucket.max %>">
+            <%= bucket.label %>
+          </button>
+        <% }); %>
+      </div>
+
+      <div class="custom-range">
+        <div>
+          <label>Min price</label>
+          <input type="number" id="min-price" value="<%= priceRange.min %>" min="0" step="500">
+        </div>
+        <div>
+          <label>Max price</label>
+          <input type="number" id="max-price" value="<%= priceRange.max %>" min="500" step="500">
+        </div>
+        <button id="apply-range" class="btn secondary">Apply range</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="popular-section">
+    <div class="list-head">
+      <h2>Popular phones in <%= rangeLabel %></h2>
+    </div>
+    <div class="popular-grid">
+      <% popularPhones.forEach(function(phone) { %>
+        <div class="popular-card">
+          <div class="phone-name"><%= phone.name %></div>
+          <div class="phone-price">₹<%= Number(phone.price).toLocaleString('en-IN') %></div>
+        </div>
+      <% }); %>
+    </div>
+  </section>
 
   <details>
     <summary>How the Value Score is calculated</summary>
@@ -63,6 +102,30 @@
   </div>
 
 <script>
+  document.querySelectorAll('.price-pill').forEach((button) => {
+    button.addEventListener('click', () => {
+      const params = new URLSearchParams(window.location.search);
+      params.set('min', button.dataset.min);
+      params.set('max', button.dataset.max);
+      window.location.search = params.toString();
+    });
+  });
+
+  document.getElementById('apply-range')?.addEventListener('click', () => {
+    const min = Number(document.getElementById('min-price').value || 0);
+    const max = Number(document.getElementById('max-price').value || 50000);
+
+    if (max < min) {
+      alert('Max price must be greater than or equal to min price.');
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    params.set('min', Math.max(0, min));
+    params.set('max', Math.max(500, max));
+    window.location.search = params.toString();
+  });
+
   function renderPhones(phones) {
     const list = document.getElementById('phone-list');
     document.getElementById('count-label').textContent = phones.length + ' phones';

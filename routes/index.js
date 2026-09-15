@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Phone = require('../models/Phone');
-const { calculateValueScores } = require('../scoring');
+const { calculateValueScores, DEFAULT_PRICE_BUCKETS, getPopularPhonesForRange } = require('../scoring');
 
 const DEFAULT_WEIGHTS = {
   performance: 30,
@@ -14,11 +14,19 @@ const DEFAULT_WEIGHTS = {
 // GET / - Renders the dashboard
 router.get('/', async (req, res) => {
   try {
+    const minPrice = Number(req.query.min) || 0;
+    const maxPrice = Number(req.query.max) || 50000;
     const phones = await Phone.find({}).lean();
     const rankedPhones = calculateValueScores(phones, DEFAULT_WEIGHTS);
-    res.render('index', { 
-      phones: rankedPhones, 
-      weights: DEFAULT_WEIGHTS 
+    const popularPhones = getPopularPhonesForRange(minPrice, maxPrice);
+
+    res.render('index', {
+      phones: rankedPhones,
+      weights: DEFAULT_WEIGHTS,
+      defaultPriceBuckets: DEFAULT_PRICE_BUCKETS,
+      priceRange: { min: minPrice, max: maxPrice },
+      popularPhones,
+      rangeLabel: `₹${Math.round(minPrice / 1000)}k – ₹${Math.round(maxPrice / 1000)}k`
     });
   } catch (err) {
     console.error(err);

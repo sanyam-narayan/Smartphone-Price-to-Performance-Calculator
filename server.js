@@ -6,6 +6,7 @@ const routes = require('./routes/index');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/spec_rs_phone_index';
 
 // Connect to MongoDB
@@ -24,6 +25,7 @@ app.use(express.json());
 // Routes
 app.use('/', routes);
 
-app.listen(PORT, () => {
+app.listen(PORT, HOST, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`External access: http://${HOST}:${PORT}`);
 });

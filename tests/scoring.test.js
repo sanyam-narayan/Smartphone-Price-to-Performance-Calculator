@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { normalize, calculateValueScores } = require('../scoring');
+const { normalize, calculateValueScores, DEFAULT_PRICE_BUCKETS, getPopularPhonesForRange } = require('../scoring');
 
 test('normalize', (t) => {
   t.test('should correctly normalize values', () => {
@@ -94,5 +94,19 @@ test('calculateValueScores', (t) => {
     
     // Identical 1 has better specs, so it should rank higher despite same price
     assert.strictEqual(ranked[0].name, "Identical 1");
+  });
+
+  t.test('should provide sensible default price buckets with ten phones each', () => {
+    assert.ok(Array.isArray(DEFAULT_PRICE_BUCKETS));
+    assert.ok(DEFAULT_PRICE_BUCKETS.length >= 5);
+    assert.ok(DEFAULT_PRICE_BUCKETS.every(bucket => Array.isArray(bucket.phones) && bucket.phones.length >= 10));
+    assert.strictEqual(DEFAULT_PRICE_BUCKETS[0].label, '₹0 – ₹5k');
+  });
+
+  t.test('should return a matching list for a custom price window', () => {
+    const phones = getPopularPhonesForRange(10000, 25000);
+    assert.ok(Array.isArray(phones));
+    assert.ok(phones.length >= 10);
+    assert.ok(phones.every(phone => phone.price >= 10000 && phone.price <= 25000));
   });
 });
