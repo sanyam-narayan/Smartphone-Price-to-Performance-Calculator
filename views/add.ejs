@@ -1,0 +1,47 @@
+<%- include('header') %>
+  <header>
+    <h1>Add New Phone</h1>
+    <a href="/" class="btn">← Back to Index</a>
+  </header>
+
+  <form action="/add" method="POST" style="background: var(--panel); padding: 20px; border-radius: 12px; border: 1px solid var(--line);">
+    <div class="form-group">
+      <label>Phone Name</label>
+      <input type="text" name="name" required placeholder="e.g. Poco M6 Pro">
+    </div>
+    <div class="form-group">
+      <label>Price (₹)</label>
+      <input type="number" name="price" required min="1">
+    </div>
+    <div class="form-group">
+      <label>AnTuTu Score</label>
+      <input type="number" name="antutu" required min="1">
+    </div>
+    <div class="form-group">
+      <label>RAM (GB)</label>
+      <select name="ram" required>
+        <option value="4">4 GB</option>
+        <option value="6">6 GB</option>
+        <option value="8">8 GB</option>
+        <option value="12">12 GB</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Storage (GB)</label>
+      <input type="number" name="storage" required min="1">
+    </div>
+    <div class="form-group">
+      <label>Battery (mAh)</label>
+      <input type="number" name="battery" required min="1">
+    </div>
+    <div class="form-group">
+      <label>Refresh Rate (Hz)</label>
+      <input type="number" name="refreshRate" required min="60">
+    </div>
+    <div class="form-group">
+      <label>Camera (MP)</label>
+      <input type="number" name="cameraMP" required min="1">
+    </div>
+    <button type="submit">Submit Phone</button>
+  </form>
+<%- include('footer') %>

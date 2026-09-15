@@ -1,0 +1,114 @@
+<%- include('header') %>
+
+  <header>
+    <h1>Spec/₹</h1>
+    <p>Ranks budget Android phones by performance-per-rupee — weighted the way you actually care about, not a fixed formula.</p>
+    <a href="/add" class="btn">+ Add New Phone</a>
+  </header>
+
+  <details>
+    <summary>How the Value Score is calculated</summary>
+    <p>
+      Each spec (benchmark score, RAM+storage, battery, refresh rate, camera) is scaled to
+      0–100 relative to the other phones in the list, using min-max normalization:
+      <code>(value - min) / (max - min) * 100</code>.
+      Your sliders weight how much each category matters, producing a Performance Score out of 100.
+      That score is then divided by price to get raw value-for-money, which is re-scaled to
+      0–100 across the list to produce the Value Score ranked below.
+    </p>
+  </details>
+
+  <div class="controls">
+    <div class="control">
+      <label><span>Performance</span><span id="v-performance"><%= weights.performance %></span></label>
+      <input type="range" id="w-performance" min="0" max="100" value="<%= weights.performance %>">
+    </div>
+    <div class="control">
+      <label><span>Memory</span><span id="v-memory"><%= weights.memory %></span></label>
+      <input type="range" id="w-memory" min="0" max="100" value="<%= weights.memory %>">
+    </div>
+    <div class="control">
+      <label><span>Battery</span><span id="v-battery"><%= weights.battery %></span></label>
+      <input type="range" id="w-battery" min="0" max="100" value="<%= weights.battery %>">
+    </div>
+    <div class="control">
+      <label><span>Display</span><span id="v-display"><%= weights.display %></span></label>
+      <input type="range" id="w-display" min="0" max="100" value="<%= weights.display %>">
+    </div>
+    <div class="control">
+      <label><span>Camera</span><span id="v-camera"><%= weights.camera %></span></label>
+      <input type="range" id="w-camera" min="0" max="100" value="<%= weights.camera %>">
+    </div>
+  </div>
+
+  <div class="list-head">
+    <h2>Ranked</h2>
+    <span id="count-label"><%= phones.length %> phones</span>
+  </div>
+  <div id="phone-list">
+    <% phones.forEach(function(p, i) { %>
+      <div class="row">
+        <div class="rank"><%= i + 1 %></div>
+        <div class="row-main">
+          <div class="row-top">
+            <span class="name"><%= p.name %></span>
+            <span class="price">₹<%= p.price.toLocaleString('en-IN') %></span>
+          </div>
+          <div class="specs"><%= p.ram %>GB/<%= p.storage %>GB • <%= p.battery %>mAh • <%= p.refreshRate %>Hz • <%= p.cameraMP %>MP</div>
+          <div class="bar-track"><div class="bar-fill" style="width:<%= p.valueScore.toFixed(1) %>%"></div></div>
+        </div>
+        <div class="score"><%= Math.round(p.valueScore) %></div>
+      </div>
+    <% }); %>
+  </div>
+
+<script>
+  function renderPhones(phones) {
+    const list = document.getElementById('phone-list');
+    document.getElementById('count-label').textContent = phones.length + ' phones';
+    
+    list.innerHTML = phones.map((p, i) => `
+      <div class="row">
+        <div class="rank">${i + 1}</div>
+        <div class="row-main">
+          <div class="row-top">
+            <span class="name">${p.name}</span>
+            <span class="price">₹${p.price.toLocaleString('en-IN')}</span>
+          </div>
+          <div class="specs">${p.ram}GB/${p.storage}GB • ${p.battery}mAh • ${p.refreshRate}Hz • ${p.cameraMP}MP</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${p.valueScore.toFixed(1)}%"></div></div>
+        </div>
+        <div class="score">${Math.round(p.valueScore)}</div>
+      </div>
+    `).join('');
+  }
+
+  async function updateRanks() {
+    const weights = {
+      performance: document.getElementById('w-performance').value,
+      memory: document.getElementById('w-memory').value,
+      battery: document.getElementById('w-battery').value,
+      display: document.getElementById('w-display').value,
+      camera: document.getElementById('w-camera').value,
+    };
+
+    ['performance', 'memory', 'battery', 'display', 'camera'].forEach(k => {
+      document.getElementById('v-' + k).textContent = weights[k];
+    });
+
+    const params = new URLSearchParams(weights);
+    try {
+      const res = await fetch('/api/phones?' + params.toString());
+      const newPhones = await res.json();
+      renderPhones(newPhones);
+    } catch (err) {
+      console.error("Failed to update phones", err);
+    }
+  }
+
+  document.querySelectorAll('input[type="range"]').forEach(el => {
+    el.addEventListener('input', updateRanks);
+  });
+</script>
+
+<%- include('footer') %>
