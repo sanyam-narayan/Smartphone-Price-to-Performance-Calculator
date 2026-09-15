@@ -1,4 +1,4 @@
-# Spec/₹ — Budget Phone Value Index
+Price to Performance Calculator for smartphones
 
 A small full-stack web application that ranks budget Android phones based on their performance-per-rupee, allowing users to dynamically customize the weights for different specifications.
 
